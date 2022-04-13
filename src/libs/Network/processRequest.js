@@ -4,6 +4,7 @@ import HttpUtils from '../HttpUtils';
 import enhanceParameters from './enhanceParameters';
 import * as NetworkEvents from './NetworkEvents';
 import * as PersistedRequests from '../actions/PersistedRequests';
+import _ from 'underscore';
 
 /**
  * @param {Object} request
@@ -48,9 +49,31 @@ export default function processRequest(request) {
         })
         .catch((error) => {
             if (error.message === CONST.ERROR.FAILED_TO_FETCH) {
+                NetworkEvents.getLogger().hmmm(`[Network] Error: ${CONST.ERROR.FAILED_TO_FETCH}`);
+
                 // Throw when we get a "Failed to fetch" error so we can retry. Very common if a user is offline or experiencing an unlikely scenario like
                 // incorrect url, bad cors headers returned by the server, DNS lookup failure etc.
                 throw error;
+            }
+
+            // These errors seem to happen for native devices with interrupted connections. Often we will see logs about Pusher disconnecting together with these.
+            // In browsers this type of failure would throw a "Failed to fetch" so we can treat these the same. This type of error may also indicate a problem with
+            // SSL certs.
+            if (_.contains([CONST.ERROR.IOS_NETWORK_CONNECTION_LOST, CONST.ERROR.NETWORK_REQUEST_FAILED], error.message)) {
+                NetworkEvents.getLogger().hmmm('[Network] Connection interruption likely', {error: error.message});
+                throw new TypeError(CONST.ERROR.FAILED_TO_FETCH);
+            }
+
+            // This message can be observed page load is interrupted (closed or navigated away). Chrome throws a generic "Failed to fetch" error so we will standardize and throw this.
+            if (_.contains([CONST.ERROR.FIREFOX_DOCUMENT_LOAD_ABORTED, CONST.ERROR.SAFARI_DOCUMENT_LOAD_ABORTED], error.message)) {
+                NetworkEvents.getLogger().hmmm('[Network] User likely navigated away from or closed browser', {error: error.message});
+                throw new TypeError(CONST.ERROR.FAILED_TO_FETCH);
+            }
+
+            // Not yet clear why this message occurs, but it is specific to iOS and tends to happen around the same time as a Pusher code 1006
+            // so it seems likely to be a spotty connection scenario.
+            if (error.message === CONST.ERROR.IOS_LOAD_FAILED) {
+                throw new TypeError(CONST.ERROR.FAILED_TO_FETCH);
             }
 
             // Cancelled requests are normal and can happen when a user logs out. No extra handling is needed here besides

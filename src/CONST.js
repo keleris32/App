@@ -317,6 +317,11 @@ const CONST = {
         REQUEST_CANCELLED: 'AbortError',
         FAILED_TO_FETCH: 'Failed to fetch',
         ENSURE_BUGBOT: 'ENSURE_BUGBOT',
+        NETWORK_REQUEST_FAILED: 'Network request failed',
+        SAFARI_DOCUMENT_LOAD_ABORTED: 'cancelled',
+        FIREFOX_DOCUMENT_LOAD_ABORTED: 'NetworkError when attempting to fetch resource.',
+        IOS_NETWORK_CONNECTION_LOST: 'The network connection was lost.',
+        IOS_LOAD_FAILED: 'Load failed',
     },
     NETWORK: {
         METHOD: {
