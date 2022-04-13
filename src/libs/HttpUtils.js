@@ -4,6 +4,14 @@ import CONFIG from '../CONFIG';
 import CONST from '../CONST';
 import ONYXKEYS from '../ONYXKEYS';
 
+class HttpsError extends Error {
+    constructor(message, status) {
+        super(message);
+        this.name = 'HttpsError';
+        this.status = status;
+    }
+}
+
 let shouldUseSecureStaging = false;
 Onyx.connect({
     key: ONYXKEYS.USER,
@@ -32,7 +40,7 @@ function processHTTPRequest(url, method = 'get', body = null, canCancel = true) 
     })
         .then((response) => {
             if (!response.ok) {
-                throw Error(response.statusText);
+                throw HttpsError(response.statusText, response.status);
             }
 
             return response.json();

@@ -321,7 +321,11 @@ const CONST = {
         SAFARI_DOCUMENT_LOAD_ABORTED: 'cancelled',
         FIREFOX_DOCUMENT_LOAD_ABORTED: 'NetworkError when attempting to fetch resource.',
         IOS_NETWORK_CONNECTION_LOST: 'The network connection was lost.',
+        IOS_NETWORK_CONNECTION_LOST_RUSSIAN: 'Сетевое соединение потеряно.',
+        IOS_NETWORK_CONNECTION_LOST_SWEDISH: 'Nätverksanslutningen förlorades.',
         IOS_LOAD_FAILED: 'Load failed',
+        SAFARI_CANNOT_PARSE_RESPONSE: 'cannot parse response',
+        GATEWAY_TIMEOUT: 'Gateway Timeout',
     },
     NETWORK: {
         METHOD: {
